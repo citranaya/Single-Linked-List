@@ -1,0 +1,118 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Membuat struct untuk menyimpan data
+typedef struct Node {
+    char name[100]; // Nama 
+    char phone[20]; // Nomor telepon 
+    struct Node *next; // Pointer ke node berikutnya dalam linked list
+} Node;
+
+// Fungsi untuk membuat node baru
+Node* createNode(char *name, char *phone) {
+    Node *newNode = (Node *)malloc(sizeof(Node)); // Mengalokasikan memori untuk node baru
+    if (newNode == NULL) { // Jika alokasi memori gagal, tampilkan pesan error dan hentikan program
+        printf("Error allocating memory!\n");
+        exit(1);
+    }
+
+    strcpy(newNode->name, name); // Salin nama yang diberikan ke node
+    strcpy(newNode->phone, phone); // Salin nomor telepon yang diberikan ke node
+    newNode->next = NULL; // Setel pointer next dari node baru ke NULL
+    return newNode; // Kembalikan pointer ke node baru yang telah dibuat
+}
+
+// Fungsi untuk menambahkan kontak ke linked list
+void tambah(Node **head, char *name, char *phone) {
+    Node *newNode = createNode(name, phone); // Buat node baru
+    if (*head == NULL) { // Jika linked list kosong, set node baru sebagai head
+        *head = newNode;
+    } 
+    else { // Jika linked list tidak kosong
+        Node *now = *head; // Mulai dari head
+        while (now->next != NULL) { // Cari node terakhir
+            now = now->next;
+        }
+        now->next = newNode; // Tambahkan node baru di akhir list
+    }
+}
+
+// Fungsi untuk mencari nomor berdasarkan nama
+Node* cariNomor(Node *head, char *name) {
+    Node *now = head; 
+    while (now != NULL) { // Selama belum mencapai akhir list
+        if (strcmp(now->name, name) == 0) { // Jika nama cocok
+            return now; // Kembalikan node yang ditemukan
+        }
+        now = now->next; // Lanjut ke node selanjutnya
+    }
+    return NULL; // Kembalikan NULL jika tidak ditemukan
+}
+
+// Fungsi untuk menampilkan semua kontak dalam linked list
+void tampilkan(Node *head) {
+    Node *now = head; // Mulai dari kepala
+    if (now == NULL) { // Jika list kosong, tampilkan pesan
+        printf("kosong.\n");
+    } else {
+        while (now != NULL) { // Selama belum mencapai akhir list
+            printf("Nama: %s\n Telepon: %s\n\n", now->name, now->phone); 
+            // Tampilkan data kontak
+            now = now->next; // Lanjut ke node berikutnya
+        }
+    }
+}
+
+// Fungsi utama untuk menjalankan program
+int main() {
+    Node *head = NULL; // Inisialisasi head dari linked list sebagai NULL
+    char name[100];
+    char phone[20];
+    int choice; // Variabel untuk pilihan menu
+
+    while (1) { // Looping terus menerus sampai pengguna memilih untuk keluar
+        printf("\nMenu:\n");
+        printf("1. Tambahkan Kontak\n");
+        printf("2. Cari Nomor\n");
+        printf("3. Tampilkan Semua Kontak\n");
+        printf("4. Keluar\n");
+        printf("Pilih nomor: ");
+        scanf("%d", &choice);
+        getchar(); 
+
+        switch (choice) {
+            case 1: // Menambahkan kontak baru
+                printf("Masukkan Nama: ");
+                fgets(name, sizeof(name), stdin);
+                name[strcspn(name, "\n")] = 0; 
+                printf("Masukkan Nomor Telepon: ");
+                fgets(phone, sizeof(phone), stdin);
+                phone[strcspn(phone, "\n")] = 0; 
+                tambah(&head, name, phone);
+                printf("kontak berhasil ditambahkan\n");
+                break;
+            case 2: // Mencari nomor berdasarkan nama
+                printf("Masukkan Nama: ");
+                fgets(name, sizeof(name), stdin);
+                name[strcspn(name, "\n")] = 0; 
+                Node *result = cariNomor(head, name);
+                if (result != NULL) {
+                     printf("Nama: %s\n Telepon: %s\n", result->name, result->phone);
+                } else {
+                    printf("Kontak tidak ditemukan.\n");
+                }
+                 break;
+            case 3: // Menampilkan semua kontak
+                tampilkan(head);
+                break;
+            case 4: // Keluar dari program
+                printf("Keluar dari program.\n");
+                return 0; // Keluar dari program
+            default: // Jika pilihan selain 1 - 4
+                printf("Pilihan tidak valid!\n");
+                 break;
+        }
+    }
+ return 0;
+}
